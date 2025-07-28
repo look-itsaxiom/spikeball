@@ -1,0 +1,49 @@
+[gd_scene load_steps=8 format=3 uid="uid://bi1x4ii8ucgnq"]
+
+[ext_resource type="Script" uid="uid://d24qgjmi5qhaj" path="res://Scripts/PlayerController.cs" id="1_m38xh"]
+[ext_resource type="Texture2D" uid="uid://d1n54r3vn2hxu" path="res://Assets/Sprites/Player_Ball.png" id="2_k40wh"]
+[ext_resource type="Texture2D" uid="uid://bbiqi8qe0cm05" path="res://Assets/Sprites/explosion.png" id="3_t4bxl"]
+[ext_resource type="Texture2D" uid="uid://h3jwwdgnsb60" path="res://Assets/Sprites/BoostMeterBackground.png" id="4_kjcw1"]
+[ext_resource type="Texture2D" uid="uid://ciek1vks2drs4" path="res://Assets/Sprites/BoostMeterProgress.png" id="5_lteax"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kokek"]
+radius = 5.0
+
+[sub_resource type="Curve" id="Curve_06p6x"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="PlayerBall" type="CharacterBody2D"]
+script = ExtResource("1_m38xh")
+
+[node name="PlayerSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_k40wh")
+
+[node name="PlayerCollider" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kokek")
+
+[node name="PlayerDieEffect" type="CPUParticles2D" parent="."]
+emitting = false
+texture = ExtResource("3_t4bxl")
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+angle_max = 360.0
+angle_curve = SubResource("Curve_06p6x")
+
+[node name="BoostCooldownBar" type="TextureProgressBar" parent="."]
+offset_left = 6.0
+offset_top = -5.0
+offset_right = 9.0
+offset_bottom = 1.0
+max_value = 2.0
+step = 0.01
+fill_mode = 3
+texture_under = ExtResource("4_kjcw1")
+texture_progress = ExtResource("5_lteax")

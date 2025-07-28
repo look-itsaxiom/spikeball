@@ -1,0 +1,215 @@
+[gd_scene load_steps=19 format=3 uid="uid://gl1ft6ymijup"]
+
+[ext_resource type="Texture2D" uid="uid://bf1vf6kbqdluv" path="res://Assets/Sprites/background.png" id="1_2i0kj"]
+[ext_resource type="Script" uid="uid://dv651v0ymfklj" path="res://Scripts/GoalManager.cs" id="2_s2gis"]
+[ext_resource type="Texture2D" uid="uid://w7adnfggmx2u" path="res://Assets/Sprites/GoalFrame.png" id="3_trttr"]
+[ext_resource type="Texture2D" uid="uid://ei7xiceyvkit" path="res://Assets/Sprites/Goal-Sheet.png" id="4_s2gis"]
+[ext_resource type="Script" uid="uid://nbbalq3p3rvv" path="res://Scripts/StartUI.cs" id="5_2i0kj"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trttr"]
+size = Vector2(6.99998, 24)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_s2gis"]
+a = Vector2(-10.1967, 5.46127)
+b = Vector2(-10.1967, 7.46127)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_2i0kj"]
+a = Vector2(11.8033, 5.46127)
+b = Vector2(9.80332, 8.46127)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2i0kj"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(0, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_m75hs"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(23, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sbqfo"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(46, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dr4po"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(69, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yvc5l"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(92, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wm70n"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(115, 0, 23, 13)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ikkc"]
+atlas = ExtResource("4_s2gis")
+region = Rect2(138, 0, 23, 13)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ofpj2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2i0kj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_m75hs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sbqfo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dr4po")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yvc5l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wm70n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ikkc")
+}],
+"loop": false,
+"name": &"goal",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s2gis"]
+size = Vector2(16, 2.5)
+
+[sub_resource type="LabelSettings" id="LabelSettings_2i0kj"]
+font_size = 8
+
+[node name="Core_Spikeball" type="Node2D"]
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="SpikeBalls" type="Node2D" parent="SpawnPoints"]
+position = Vector2(0, -1)
+
+[node name="SpikeBall1" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(-31, -26)
+
+[node name="SpikeBall2" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(0, 69)
+
+[node name="SpikeBall3" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(62, -25)
+
+[node name="SpikeBall4" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(81, 59)
+
+[node name="SpikeBall5" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(-80, -12)
+
+[node name="SpikeBall6" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
+position = Vector2(18, 23)
+
+[node name="Ball" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(-97, 51)
+
+[node name="Background" type="Sprite2D" parent="."]
+texture = ExtResource("1_2i0kj")
+
+[node name="WorldBarrier" type="StaticBody2D" parent="Background"]
+
+[node name="WorldBarrierCollider" type="CollisionPolygon2D" parent="Background/WorldBarrier"]
+build_mode = 1
+polygon = PackedVector2Array(-123, -52, 123, -52, 123, 86, -123, 86)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="GoalManager" type="Node2D" parent="."]
+position = Vector2(102, 2)
+script = ExtResource("2_s2gis")
+
+[node name="GoalFrameSprite" type="Sprite2D" parent="GoalManager"]
+texture = ExtResource("3_trttr")
+
+[node name="GoalBackBoard" type="StaticBody2D" parent="GoalManager/GoalFrameSprite"]
+position = Vector2(-1.80332, -6.46127)
+
+[node name="GoalBackBoardCollider" type="CollisionShape2D" parent="GoalManager/GoalFrameSprite/GoalBackBoard"]
+position = Vector2(16.3033, 2.46127)
+shape = SubResource("RectangleShape2D_trttr")
+
+[node name="GoalRimGuideFront" type="CollisionShape2D" parent="GoalManager/GoalFrameSprite/GoalBackBoard"]
+position = Vector2(0.803322, 0.46127)
+shape = SubResource("SegmentShape2D_s2gis")
+
+[node name="GoalRimGuidBack" type="CollisionShape2D" parent="GoalManager/GoalFrameSprite/GoalBackBoard"]
+position = Vector2(-0.196678, 0.46127)
+shape = SubResource("SegmentShape2D_2i0kj")
+
+[node name="GoalNetSprite" type="AnimatedSprite2D" parent="GoalManager"]
+position = Vector2(-3, 5)
+sprite_frames = SubResource("SpriteFrames_ofpj2")
+animation = &"goal"
+frame = 6
+frame_progress = 1.0
+
+[node name="GoalNet" type="Area2D" parent="GoalManager/GoalNetSprite"]
+position = Vector2(1.19668, -11.4613)
+
+[node name="GoalNetCollider" type="CollisionShape2D" parent="GoalManager/GoalNetSprite/GoalNet"]
+position = Vector2(0.803322, 10.4613)
+shape = SubResource("RectangleShape2D_s2gis")
+
+[node name="StartUI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -120.0
+offset_top = -80.0
+offset_right = 120.0
+offset_bottom = 80.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("5_2i0kj")
+
+[node name="PlayerScoresContainer" type="HBoxContainer" parent="StartUI"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="PreRoundTimerPanel" type="Panel" parent="StartUI"]
+layout_mode = 2
+offset_right = 240.0
+offset_bottom = 160.0
+
+[node name="PreRoundTimerLabel" type="Label" parent="StartUI/PreRoundTimerPanel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_top = -11.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "1"
+horizontal_alignment = 1
+
+[node name="StartButton" type="Button" parent="StartUI"]
+layout_mode = 2
+offset_left = 72.0
+offset_top = 64.0
+offset_right = 168.0
+offset_bottom = 95.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+text = "Start Game"
+
+[node name="RoundTimerLabel" type="Label" parent="StartUI"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 40.0
+grow_vertical = 0
+text = "1"
+label_settings = SubResource("LabelSettings_2i0kj")
+horizontal_alignment = 1
+vertical_alignment = 1

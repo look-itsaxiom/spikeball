@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://byddccpfu4axo"]
+
+[ext_resource type="Script" uid="uid://d24qgjmi5qhaj" path="res://Scripts/PlayerController.cs" id="1_lq7an"]
+[ext_resource type="Texture2D" uid="uid://cq5qy0xry2rof" path="res://Assets/Sprites/Player_SpikeBall.png" id="2_7i5qk"]
+[ext_resource type="Texture2D" uid="uid://bbiqi8qe0cm05" path="res://Assets/Sprites/explosion.png" id="3_7i5qk"]
+
+[sub_resource type="Curve" id="Curve_wlvmy"]
+_limits = [-360.0, 360.0, 0.0, 1.0]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="PlayerSpikeBall" type="CharacterBody2D"]
+script = ExtResource("1_lq7an")
+
+[node name="PlayerSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_7i5qk")
+
+[node name="SpikeCollider" type="CollisionPolygon2D" parent="."]
+position = Vector2(0, -3.45707e-07)
+scale = Vector2(0.8, 0.8)
+polygon = PackedVector2Array(-10, 4.32134e-07, -10, 4.32134e-07, -5, -10, 5, -10, 10, -10, 10, 1.25, 7.5, 10, 6.25, 10, -2.5, 8.75, -7.5, 7.5, -7.5, 6.25, -8.75, 5, -10, 2.5)
+
+[node name="PlayerDieEffect" type="CPUParticles2D" parent="."]
+emitting = false
+texture = ExtResource("3_7i5qk")
+lifetime = 0.5
+one_shot = true
+explosiveness = 1.0
+direction = Vector2(1, 1)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 50.0
+initial_velocity_max = 100.0
+angle_max = 360.0
+angle_curve = SubResource("Curve_wlvmy")
