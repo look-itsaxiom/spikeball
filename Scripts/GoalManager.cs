@@ -25,8 +25,12 @@ public partial class GoalManager : Node2D
     {
         if (body is PlayerController playerController && playerController.PlayerMode == PlayerMode.Ball)
         {
-            GoalNetSprite.Play("goal");
-            GameManager.Instance.EmitSignal("GoalScored");
+            // only count a goal if the player enters the goal from the top
+            if (playerController.GlobalPosition.Y < GlobalPosition.Y)
+            {
+                GoalNetSprite.Play("goal");
+                GameManager.Instance.EmitSignal("GoalScored");
+            }
         }
     }
 }

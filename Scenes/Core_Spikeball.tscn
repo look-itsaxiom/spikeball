@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://gl1ft6ymijup"]
+[gd_scene load_steps=20 format=3 uid="uid://gl1ft6ymijup"]
 
 [ext_resource type="Texture2D" uid="uid://bf1vf6kbqdluv" path="res://Assets/Sprites/background.png" id="1_2i0kj"]
 [ext_resource type="Script" uid="uid://dv651v0ymfklj" path="res://Scripts/GoalManager.cs" id="2_s2gis"]
@@ -77,6 +77,9 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_s2gis"]
 size = Vector2(16, 2.5)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2i0kj"]
+size = Vector2(41, 138)
+
 [sub_resource type="LabelSettings" id="LabelSettings_2i0kj"]
 font_size = 8
 
@@ -97,7 +100,7 @@ position = Vector2(0, 69)
 position = Vector2(62, -25)
 
 [node name="SpikeBall4" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
-position = Vector2(81, 59)
+position = Vector2(68, 59)
 
 [node name="SpikeBall5" type="Marker2D" parent="SpawnPoints/SpikeBalls"]
 position = Vector2(-80, -12)
@@ -154,6 +157,14 @@ position = Vector2(1.19668, -11.4613)
 [node name="GoalNetCollider" type="CollisionShape2D" parent="GoalManager/GoalNetSprite/GoalNet"]
 position = Vector2(0.803322, 10.4613)
 shape = SubResource("RectangleShape2D_s2gis")
+
+[node name="SpikeBallBlocker" type="StaticBody2D" parent="GoalManager"]
+collision_layer = 2
+collision_mask = 2
+
+[node name="SpikeBallBlocker" type="CollisionShape2D" parent="GoalManager/SpikeBallBlocker"]
+position = Vector2(0.5, 15)
+shape = SubResource("RectangleShape2D_2i0kj")
 
 [node name="StartUI" type="Control" parent="."]
 layout_mode = 3

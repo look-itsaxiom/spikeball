@@ -10,6 +10,8 @@ _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
 point_count = 2
 
 [node name="PlayerSpikeBall" type="CharacterBody2D"]
+collision_layer = 3
+collision_mask = 3
 script = ExtResource("1_lq7an")
 
 [node name="PlayerSprite" type="Sprite2D" parent="."]
