@@ -12,13 +12,13 @@ public partial class GoalManager : Node2D
         GoalNetSprite = GetNode<AnimatedSprite2D>("GoalNetSprite");
         GoalArea = GetNode<Area2D>("GoalNetSprite/GoalNet");
         GoalArea.BodyEntered += OnGoalNetEntered;
-        GameManager.Instance.BallPlayerChanged += OnBallPlayerChanged;
+        GetParent<SpikeballManager>().BallPlayerChanged += OnBallPlayerChanged;
     }
 
     private void OnBallPlayerChanged()
     {
-        Player player = GameManager.Instance.GetBallPlayer();
-        GoalNetSprite.Modulate = PlayerData.PlayerColors[player.Color];
+        Player player = GetParent<SpikeballManager>().GetBallPlayer();
+        GoalNetSprite.Modulate = player.Color;
     }
 
     private void OnGoalNetEntered(Node2D body)
@@ -29,7 +29,7 @@ public partial class GoalManager : Node2D
             if (playerController.GlobalPosition.Y < GlobalPosition.Y)
             {
                 GoalNetSprite.Play("goal");
-                GameManager.Instance.EmitSignal("GoalScored");
+                GetParent<SpikeballManager>().EmitSignal("GoalScored");
             }
         }
     }

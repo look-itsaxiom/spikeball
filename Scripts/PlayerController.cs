@@ -94,7 +94,7 @@ public partial class PlayerController : CharacterBody2D
 		hasExploded = true;
 		PlayerSprite.Visible = false;
 		PlayerDieEffect.Emitting = true;
-		GameManager.Instance.EmitSignal("GoalStopped");
+		GetParent<SpikeballManager>().EmitSignal("GoalStopped");
 	}
 
 	public void InitPlayerState(Player playerState)
@@ -103,7 +103,7 @@ public partial class PlayerController : CharacterBody2D
 		PlayerMode = playerState.Mode;
 		PlayerSprite = GetNode<Sprite2D>("PlayerSprite");
 		PlayerDieEffect = GetNode<CpuParticles2D>("PlayerDieEffect");
-		PlayerData.PlayerColors.TryGetValue(playerState.Color, out Color color);
+		Color color = playerState.Color;
 		PlayerDieEffect.Color = color;
 		PlayerSprite.Modulate = color;
 
@@ -116,14 +116,14 @@ public partial class PlayerController : CharacterBody2D
 				break;
 			case PlayerMode.SpikeBall:
 				Speed = PlayerData.SPIKEBALL_SPEED;
-				GameManager.Instance.GoalScored += Explode;
+				GetParent<SpikeballManager>().GoalScored += Explode;
 				break;
 		}
 	}
 
 	public override void _ExitTree()
 	{
-		GameManager.Instance.GoalScored -= Explode;
+		GetParent<SpikeballManager>().GoalScored -= Explode;
 		base._ExitTree();
 	}
 

@@ -13,22 +13,17 @@ public partial class StartUI : Control
     public bool ListenForPreRoundTimer = false;
     public Label RoundTimerLabel;
     public Dictionary<int, Label> PlayerScoreLabels = new Dictionary<int, Label>();
+    public Timer PreRoundTimer;
+    public Timer RoundTimer;
 
     public override void _Ready()
     {
-        StartButton = GetNode<Button>("StartButton");
         PlayerScoresContainer = GetNode<HBoxContainer>("PlayerScoresContainer");
         PreRoundTimerPanel = GetNode<Panel>("PreRoundTimerPanel");
         PreRoundTimerLabel = GetNode<Label>("PreRoundTimerPanel/PreRoundTimerLabel");
         RoundTimerLabel = GetNode<Label>("RoundTimerLabel");
-        StartButton.Pressed += OnStartButtonPressed;
-    }
-
-    private void OnStartButtonPressed()
-    {
-        GameManager.Instance.StartGame();
-        StartButton.Disabled = true;
-        StartButton.Visible = false;
+        PreRoundTimer = GetParent<SpikeballManager>().PreRoundTimer;
+        RoundTimer = GetParent<SpikeballManager>().RoundTimer;
     }
 
     public void CreatePlayerScoreUI(Dictionary<int, Player> players)
@@ -51,7 +46,7 @@ public partial class StartUI : Control
             scoreLabel.Text = "0";
             scoreLabel.LabelSettings = new LabelSettings
             {
-                FontColor = PlayerData.PlayerColors[player.Color],
+                FontColor = player.Color,
             };
             PlayerScoresContainer.AddChild(scoreLabel);
             PlayerScoreLabels[player.Id] = scoreLabel;
@@ -71,11 +66,13 @@ public partial class StartUI : Control
 
     public override void _Process(double delta)
     {
+        if (RoundTimer == null || PreRoundTimer == null) return;
+
         if (ListenForPreRoundTimer)
         {
-            PreRoundTimerLabel.Text = ((int)GameManager.Instance.PreRoundTimer.TimeLeft).ToString();
+            PreRoundTimerLabel.Text = ((int)PreRoundTimer.TimeLeft).ToString();
         }
 
-        RoundTimerLabel.Text = ((int)GameManager.Instance.RoundTimer.TimeLeft).ToString();
+        RoundTimerLabel.Text = ((int)RoundTimer.TimeLeft).ToString();
     }
 }

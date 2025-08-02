@@ -1,6 +1,7 @@
-[gd_scene load_steps=20 format=3 uid="uid://gl1ft6ymijup"]
+[gd_scene load_steps=21 format=3 uid="uid://gl1ft6ymijup"]
 
 [ext_resource type="Texture2D" uid="uid://bf1vf6kbqdluv" path="res://Assets/Sprites/background.png" id="1_2i0kj"]
+[ext_resource type="Script" uid="uid://dnryh36pjjiwj" path="res://Scripts/SpikeballManager.cs" id="1_m75hs"]
 [ext_resource type="Script" uid="uid://dv651v0ymfklj" path="res://Scripts/GoalManager.cs" id="2_s2gis"]
 [ext_resource type="Texture2D" uid="uid://w7adnfggmx2u" path="res://Assets/Sprites/GoalFrame.png" id="3_trttr"]
 [ext_resource type="Texture2D" uid="uid://ei7xiceyvkit" path="res://Assets/Sprites/Goal-Sheet.png" id="4_s2gis"]
@@ -84,6 +85,7 @@ size = Vector2(41, 138)
 font_size = 8
 
 [node name="Core_Spikeball" type="Node2D"]
+script = ExtResource("1_m75hs")
 
 [node name="SpawnPoints" type="Node2D" parent="."]
 
@@ -201,16 +203,6 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "1"
 horizontal_alignment = 1
-
-[node name="StartButton" type="Button" parent="StartUI"]
-layout_mode = 2
-offset_left = 72.0
-offset_top = 64.0
-offset_right = 168.0
-offset_bottom = 95.0
-size_flags_horizontal = 4
-size_flags_vertical = 4
-text = "Start Game"
 
 [node name="RoundTimerLabel" type="Label" parent="StartUI"]
 layout_mode = 1
