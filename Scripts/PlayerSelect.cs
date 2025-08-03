@@ -25,12 +25,11 @@ public partial class PlayerSelect : Control
     public Control ColorOptionTemplate;
     public VBoxContainer PlayerLanesContainer;
     public Label JoinBanner;
-    [Export]
     public Dictionary<int, Color> colorXPositionMap = new Dictionary<int, Color>();
-    [Export]
     public Dictionary<int, Control> playerIdToLaneMap = new Dictionary<int, Control>();
-    [Export]
     public Dictionary<int, Array<Vector2I>> playerLaneAnchorPoints = new Dictionary<int, Array<Vector2I>>();
+    public Dictionary<int, Label> playerNumberLabels = new Dictionary<int, Label>();
+    public Dictionary<int, Label> playerReadyLabels = new Dictionary<int, Label>();
     public PackedScene PlayerColorSelectorScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerColorSelector.tscn");
 
     public override void _Ready()
@@ -110,7 +109,7 @@ public partial class PlayerSelect : Control
             colorRect.Color = color;
             ColorOptionsContainer.AddChild(colorOption);
         }
-        ColorOptionTemplate.QueueFree();
+        ColorOptionTemplate.Free();
 
         CallDeferred(nameof(MapColorPositions));
     }
@@ -122,25 +121,27 @@ public partial class PlayerSelect : Control
             colorXPositionMap.Add((int)child.Position.X, child.GetNode<ColorRect>("ColorRect").Color);
         }
 
-        InitializeColorAnchorPoints();
+        InitializePlayerLanes();
     }
 
 
-    private void InitializeColorAnchorPoints()
+    private void InitializePlayerLanes()
     {
         for (int i = 0; i < PlayerLanesContainer.GetChildCount(); i++)
         {
             if (PlayerLanesContainer.GetChild(i) is Control playerLane)
             {
+                playerNumberLabels[i + 1] = playerLane.GetNode<Label>($"Player{i + 1}LabelContainer/Player{i + 1}Label");
+                playerReadyLabels[i + 1] = playerLane.GetNode<Label>($"Player{i + 1}LabelContainer/Player{i + 1}ReadyLabel");
                 var anchorPoints = new Array<Vector2I>();
                 foreach (Control child in ColorOptionsContainer.GetChildren())
                 {
                     if (child is Control colorOption)
                     {
                         // Calculate the center of the color option horizontally
-                        float centerX = colorOption.GetScreenPosition().X + colorOption.Size.X / 2;
+                        float centerX = colorOption.GetPosition().X + colorOption.Size.X / 2 - 8;
                         // Calculate the center of the player lane vertically
-                        float centerY = playerLane.GetScreenPosition().Y + playerLane.Size.Y / 2;
+                        float centerY = playerLane.GetPosition().Y + playerLane.Size.Y / 2 - 8;
 
                         Vector2I anchorPoint = new Vector2I((int)centerX, (int)centerY);
                         GD.Print($"Anchor point for Player {i + 1}: {anchorPoint}");

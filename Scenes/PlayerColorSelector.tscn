@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dm2s0qnalct73"]
 
-[ext_resource type="Texture2D" uid="uid://bkik6c6nj2ct4" path="res://Assets/Sprites/controllerIcon.png" id="1_mk7v7"]
+[ext_resource type="Texture2D" uid="uid://dk4ere25bkyi4" path="res://Assets/Sprites/controllerIconWhite.png" id="1_mk7v7"]
 [ext_resource type="Script" uid="uid://m38yw0ciw6bm" path="res://Scripts/PlayerColorSelector.cs" id="2_dsuao"]
 
 [node name="PlayerColorSelector" type="TextureRect"]
