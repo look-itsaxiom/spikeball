@@ -3,4 +3,4 @@
 [resource]
 font_names = PackedStringArray("Lucida Console")
 subpixel_positioning = 0
-oversampling = 1.0
+oversampling = 1.4

@@ -1,15 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://ccpx0462saqxv"]
+[gd_scene load_steps=7 format=3 uid="uid://ccpx0462saqxv"]
 
 [ext_resource type="Texture2D" uid="uid://bf1vf6kbqdluv" path="res://Assets/Sprites/background.png" id="1_853f1"]
 [ext_resource type="Script" uid="uid://8nft46oyntyy" path="res://Scripts/PlayerSelect.cs" id="1_tt5f1"]
 [ext_resource type="SystemFont" uid="uid://cipoqxrmc12nl" path="res://Assets/Resources/MenuFont.tres" id="3_8saeu"]
 [ext_resource type="LabelSettings" uid="uid://co6q27s87jlna" path="res://Assets/Resources/PlayerLabelSettings.tres" id="3_ghw46"]
+[ext_resource type="Texture2D" uid="uid://frlo7sufabds" path="res://Assets/Sprites/logo.png" id="5_df05h"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_8saeu"]
 font = ExtResource("3_8saeu")
-font_size = 13
+font_size = 8
 
-[node name="CanvasLayer" type="CanvasLayer"]
+[node name="START" type="CanvasLayer"]
 
 [node name="TextureRect" type="TextureRect" parent="."]
 anchors_preset = 15
@@ -22,62 +23,6 @@ offset_bottom = 40.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("1_853f1")
-
-[node name="MainMenu" type="Control" parent="."]
-visible = false
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="Panel" type="Panel" parent="MainMenu"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="TextureRect" type="TextureRect" parent="MainMenu"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 40.0
-grow_horizontal = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MainMenu"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -48.0
-offset_top = -50.0
-offset_right = 48.0
-offset_bottom = 51.0
-grow_horizontal = 2
-grow_vertical = 2
-alignment = 1
-
-[node name="Button" type="Button" parent="MainMenu/VBoxContainer"]
-layout_mode = 2
-text = "Start Game"
-
-[node name="Button2" type="Button" parent="MainMenu/VBoxContainer"]
-layout_mode = 2
-text = "Options"
-
-[node name="Button3" type="Button" parent="MainMenu/VBoxContainer"]
-layout_mode = 2
-text = "Exit"
 
 [node name="PlayerSelect" type="Control" parent="."]
 layout_mode = 3
@@ -96,7 +41,7 @@ anchors_preset = 14
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_top = -40.0
+offset_top = -37.0
 offset_bottom = 80.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -255,9 +200,18 @@ vertical_alignment = 1
 
 [node name="JoinBanner" type="Label" parent="PlayerSelect"]
 layout_mode = 0
+offset_top = 25.0
 offset_right = 240.0
 offset_bottom = 40.0
 text = "Press Start To Join"
 label_settings = SubResource("LabelSettings_8saeu")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TextureRect" type="TextureRect" parent="PlayerSelect"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 23.0
+grow_horizontal = 2
+texture = ExtResource("5_df05h")
