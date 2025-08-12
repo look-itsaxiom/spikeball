@@ -1,0 +1,62 @@
+name: Build and Deploy Desktop Builds
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v1
+        with:
+          version: 4.4.1
+          include-templates: true
+          use-dotnet: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build project
+        run: dotnet build --configuration ExportRelease
+
+      - name: Import project
+        run: godot --headless --import
+        
+      - name: Export for Linux
+        run: |
+          mkdir -p build/linux
+          godot --headless --export-release "Linux/X11" build/linux/Spikeball.x86_64
+          
+      - name: Export for Windows
+        run: |
+          mkdir -p build/windows
+          godot --headless --export-release "Windows Desktop" build/windows/Spikeball.exe
+
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Release v${{ github.run_number }}
+          files: |
+            build/linux/Spikeball.x86_64
+            build/windows/Spikeball.exe
+          body: |
+            Automated build from commit ${{ github.sha }}
+            
+            **Note**: This is a C# Godot project. Web export is not supported in Godot 4 with C#/.NET.
+            Desktop executables are provided instead.

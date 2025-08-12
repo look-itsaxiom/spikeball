@@ -208,6 +208,14 @@ label_settings = SubResource("LabelSettings_8saeu")
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="StartGameButton" type="Button" parent="PlayerSelect"]
+layout_mode = 0
+offset_left = 85.0
+offset_top = 135.0
+offset_right = 155.0
+offset_bottom = 150.0
+text = "START GAME"
+
 [node name="TextureRect" type="TextureRect" parent="PlayerSelect"]
 layout_mode = 1
 anchors_preset = 10
