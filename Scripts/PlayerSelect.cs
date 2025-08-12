@@ -1,6 +1,7 @@
 using Godot;
 using Godot.Collections;
 using System;
+using System.Linq;
 
 public partial class PlayerSelect : Control
 {
@@ -30,7 +31,10 @@ public partial class PlayerSelect : Control
     public Dictionary<int, Array<Vector2I>> playerLaneAnchorPoints = new Dictionary<int, Array<Vector2I>>();
     public Dictionary<int, Label> playerNumberLabels = new Dictionary<int, Label>();
     public Dictionary<int, Label> playerReadyLabels = new Dictionary<int, Label>();
+    public Dictionary<int, bool> playerReadyStates = new Dictionary<int, bool>();
     public PackedScene PlayerColorSelectorScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerColorSelector.tscn");
+    public Button StartGameButton;
+    public const int MIN_PLAYERS = 2;
 
     public override void _Ready()
     {
@@ -38,10 +42,14 @@ public partial class PlayerSelect : Control
         ColorOptionTemplate = GetNode<Control>("PlayerColorSelect/ColorOptions/ColorOption");
         JoinBanner = GetNode<Label>("JoinBanner");
         PlayerLanesContainer = GetNode<VBoxContainer>("PlayerColorSelect/PlayerLanes");
+        StartGameButton = GetNode<Button>("StartGameButton");
 
         InitializeColorOptions();
 
         JoinBanner.Visible = true;
+        StartGameButton.Visible = false;
+        StartGameButton.Pressed += StartGame;
+        
         Timer joinBannerTimer = new Timer();
         joinBannerTimer.WaitTime = 0.75f;
         joinBannerTimer.OneShot = false;
@@ -88,6 +96,10 @@ public partial class PlayerSelect : Control
             playerColorSelector.InitializePlayerColorSelector(anchorPoints, playerRegistration.Id);
             playerLane.AddChild(playerColorSelector);
             playerColorSelector.ColorSelected += SetPlayerColor;
+            playerColorSelector.PlayerReady += OnPlayerReady;
+            
+            // Initialize player ready state
+            playerReadyStates[playerRegistration.Id] = false;
         }
     }
 
@@ -97,6 +109,41 @@ public partial class PlayerSelect : Control
         {
             PlayerRegistrar.Instance.SetPlayerColor(playerNumber, color);
         }
+    }
+
+    private void OnPlayerReady(int playerNumber, bool isReady)
+    {
+        playerReadyStates[playerNumber] = isReady;
+        
+        // Update the ready label for this player
+        if (playerReadyLabels.TryGetValue(playerNumber, out var readyLabel))
+        {
+            readyLabel.Text = isReady ? "READY" : "";
+        }
+        
+        UpdateStartGameButton();
+    }
+
+    private void UpdateStartGameButton()
+    {
+        // Check if we have at least MIN_PLAYERS and all joined players are ready
+        var joinedPlayers = playerReadyStates.Count;
+        var readyPlayers = playerReadyStates.Count(kvp => kvp.Value);
+        
+        bool canStartGame = joinedPlayers >= MIN_PLAYERS && readyPlayers == joinedPlayers;
+        
+        StartGameButton.Visible = canStartGame;
+        
+        if (canStartGame)
+        {
+            JoinBanner.Visible = false;
+        }
+    }
+
+    private void StartGame()
+    {
+        // Transition to the game scene
+        GetTree().ChangeSceneToFile("res://Scenes/Core_Spikeball.tscn");
     }
 
 
@@ -131,8 +178,9 @@ public partial class PlayerSelect : Control
         {
             if (PlayerLanesContainer.GetChild(i) is Control playerLane)
             {
-                playerNumberLabels[i + 1] = playerLane.GetNode<Label>($"Player{i + 1}LabelContainer/Player{i + 1}Label");
-                playerReadyLabels[i + 1] = playerLane.GetNode<Label>($"Player{i + 1}LabelContainer/Player{i + 1}ReadyLabel");
+                int playerLaneNumber = i + 1;
+                playerNumberLabels[playerLaneNumber] = playerLane.GetNode<Label>($"Player{playerLaneNumber}LabelContainer/Player{playerLaneNumber}Label");
+                playerReadyLabels[playerLaneNumber] = playerLane.GetNode<Label>($"Player{playerLaneNumber}LabelContainer/Player{playerLaneNumber}ReadyLabel");
                 var anchorPoints = new Array<Vector2I>();
                 foreach (Control child in ColorOptionsContainer.GetChildren())
                 {
@@ -144,11 +192,11 @@ public partial class PlayerSelect : Control
                         float centerY = playerLane.GetPosition().Y + playerLane.Size.Y / 2 - 8;
 
                         Vector2I anchorPoint = new Vector2I((int)centerX, (int)centerY);
-                        GD.Print($"Anchor point for Player {i + 1}: {anchorPoint}");
+                        GD.Print($"Anchor point for Player {playerLaneNumber}: {anchorPoint}");
                         anchorPoints.Add(anchorPoint);
                     }
                 }
-                playerLaneAnchorPoints.Add(i + 1, anchorPoints);
+                playerLaneAnchorPoints.Add(playerLaneNumber, anchorPoints);
             }
         }
         GD.Print("Player lanes anchor points initialized.");
