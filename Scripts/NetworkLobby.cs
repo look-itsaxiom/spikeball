@@ -10,6 +10,7 @@ public partial class NetworkLobby : Control
     private Button backButton;
     private Label statusLabel;
     private VBoxContainer lobbyPlayerList;
+    private Button startGameButton;
     
     public override void _Ready()
     {
@@ -21,6 +22,14 @@ public partial class NetworkLobby : Control
         backButton = GetNode<Button>("VBoxContainer/Buttons/BackButton");
         statusLabel = GetNode<Label>("VBoxContainer/StatusLabel");
         lobbyPlayerList = GetNode<VBoxContainer>("VBoxContainer/LobbyPlayerList");
+        
+        // Try to get start game button
+        if (HasNode("VBoxContainer/Buttons/StartGameButton"))
+        {
+            startGameButton = GetNode<Button>("VBoxContainer/Buttons/StartGameButton");
+            startGameButton.Pressed += OnStartGameButtonPressed;
+            startGameButton.Visible = false; // Hidden by default
+        }
         
         // Set default values
         portInput.Text = NetworkManager.DEFAULT_PORT.ToString();
@@ -40,6 +49,9 @@ public partial class NetworkLobby : Control
             NetworkManager.Instance.ServerDisconnected += OnServerDisconnected;
         }
         
+        // Connect to multiplayer signals directly for connection success
+        Multiplayer.ConnectedToServer += OnConnectionSucceeded;
+        
         UpdateUI();
     }
     
@@ -50,12 +62,15 @@ public partial class NetworkLobby : Control
         
         if (result == Error.Ok)
         {
-            statusLabel.Text = $"Hosting on port {port}";
+            statusLabel.Text = $"Hosting on port {port}. Waiting for players...";
             statusLabel.Modulate = Colors.Green;
             UpdateUI();
             
-            // Allow host to play locally (hotseat)
-            GetTree().ChangeSceneToFile("res://Scenes/MainMenu.tscn");
+            // Show start button for host immediately 
+            if (startGameButton != null)
+            {
+                startGameButton.Visible = true;
+            }
         }
         else
         {
@@ -84,9 +99,32 @@ public partial class NetworkLobby : Control
         }
     }
     
+    private void OnConnectionSucceeded()
+    {
+        statusLabel.Text = "Connected to server! Waiting for host to start...";
+        statusLabel.Modulate = Colors.Green;
+        UpdateUI();
+    }
+    
     private void OnBackButtonPressed()
     {
         NetworkManager.Instance.CloseConnection();
+        GetTree().ChangeSceneToFile("res://Scenes/MainMenu.tscn");
+    }
+    
+    private void OnStartGameButtonPressed()
+    {
+        // Only the host can start the game
+        if (NetworkManager.Instance.IsHost)
+        {
+            // Signal all clients to transition to player select
+            Rpc(nameof(TransitionToPlayerSelect));
+        }
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void TransitionToPlayerSelect()
+    {
         GetTree().ChangeSceneToFile("res://Scenes/MainMenu.tscn");
     }
     
@@ -95,6 +133,12 @@ public partial class NetworkLobby : Control
         statusLabel.Text = $"Player {peerId} connected";
         statusLabel.Modulate = Colors.Green;
         UpdatePlayerList();
+        
+        // Show start button for host when at least one player is connected
+        if (NetworkManager.Instance.IsHost && startGameButton != null)
+        {
+            startGameButton.Visible = true;
+        }
     }
     
     private void OnPlayerDisconnected(int peerId)
@@ -162,5 +206,7 @@ public partial class NetworkLobby : Control
             NetworkManager.Instance.ConnectionFailed -= OnConnectionFailed;
             NetworkManager.Instance.ServerDisconnected -= OnServerDisconnected;
         }
+        
+        Multiplayer.ConnectedToServer -= OnConnectionSucceeded;
     }
 }
