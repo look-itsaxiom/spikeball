@@ -30,6 +30,8 @@ public partial class PlayerController : CharacterBody2D
 	private Vector2 networkPosition;
 	private Vector2 networkVelocity;
 	private bool useNetworkState = false;
+	private float networkSyncTimer = 0.0f;
+	private const float NETWORK_SYNC_RATE = 0.05f; // Sync 20 times per second
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -41,6 +43,10 @@ public partial class PlayerController : CharacterBody2D
 
 		if (boostCooldownTimer > 0.0f)
 			boostCooldownTimer -= (float)delta;
+		
+		// Update network sync timer
+		if (networkSyncTimer > 0.0f)
+			networkSyncTimer -= (float)delta;
 
 		// For network players, use interpolated network state
 		if (!IsLocal && useNetworkState)
@@ -78,10 +84,11 @@ public partial class PlayerController : CharacterBody2D
 
 		HandleMove(Velocity, delta);
 		
-		// Sync position and velocity over network if this is a local player
-		if (IsLocal && NetworkManager.Instance != null && NetworkManager.Instance.IsNetworkActive)
+		// Sync position and velocity over network if this is a local player (at a limited rate)
+		if (IsLocal && NetworkManager.Instance != null && NetworkManager.Instance.IsNetworkActive && networkSyncTimer <= 0.0f)
 		{
 			Rpc(nameof(SyncPlayerState), GlobalPosition, Velocity, isBoosting, boostCooldownTimer);
+			networkSyncTimer = NETWORK_SYNC_RATE;
 		}
 	}
 
