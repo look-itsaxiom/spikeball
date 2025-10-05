@@ -81,7 +81,7 @@ public partial class PlayerController : CharacterBody2D
 		// Sync position and velocity over network if this is a local player
 		if (IsLocal && NetworkManager.Instance != null && NetworkManager.Instance.IsNetworkActive)
 		{
-			RpcId(0, nameof(SyncPlayerState), GlobalPosition, Velocity, isBoosting, boostCooldownTimer);
+			Rpc(nameof(SyncPlayerState), GlobalPosition, Velocity, isBoosting, boostCooldownTimer);
 		}
 	}
 

@@ -215,3 +215,19 @@ anchor_right = 1.0
 offset_bottom = 23.0
 grow_horizontal = 2
 texture = ExtResource("5_df05h")
+
+[node name="NetworkButton" type="Button" parent="PlayerSelect"]
+layout_mode = 0
+offset_left = 170.0
+offset_top = 145.0
+offset_right = 235.0
+offset_bottom = 155.0
+text = "Network Play"
+
+[node name="StartGameButton" type="Button" parent="PlayerSelect"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 145.0
+offset_right = 60.0
+offset_bottom = 155.0
+text = "Start Game"

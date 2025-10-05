@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Spikeball"
-run/main_scene="uid://gl1ft6ymijup"
+run/main_scene="uid://ccpx0462saqxv"
 config/features=PackedStringArray("4.4", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 
