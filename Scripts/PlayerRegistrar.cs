@@ -57,6 +57,14 @@ public partial class PlayerRegistrar : Node
         }
 
         int newPlayerId = RegisteredPlayers.Count + 1;
+        int peerId = -1;
+        bool isLocal = true;
+        
+        // In network mode, use the network peer ID
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsNetworkActive)
+        {
+            peerId = NetworkManager.Instance.GetLocalPeerId();
+        }
 
         foreach (var actionName in ActionNames)
         {
@@ -75,7 +83,7 @@ public partial class PlayerRegistrar : Node
 
         // Create a new PlayerRegistration with a new ID and the given device ID
 
-        var playerRegistration = new PlayerRegistration(newPlayerId, deviceId, Colors.White);
+        var playerRegistration = new PlayerRegistration(newPlayerId, deviceId, Colors.White, peerId, isLocal);
         RegisteredPlayers.Add(playerRegistration);
         GD.Print($"Registered new player with ID {newPlayerId} for device {deviceId}.");
         return playerRegistration;

@@ -24,6 +24,8 @@ namespace Players
         public Color Color { get; set; }
         public int Id { get; set; }
         public PlayerMode Mode { get; set; }
+        public int PeerId { get; set; } = -1; // Network peer ID, -1 for local-only
+        public bool IsLocal { get; set; } = true; // Whether this player is controlled locally
     }
 
     public partial class PlayerRegistration : Resource
@@ -31,11 +33,16 @@ namespace Players
         public Color Color { get; set; }
         public int Id { get; set; }
         public int Device { get; set; }
-        public PlayerRegistration(int id, int device, Color color)
+        public int PeerId { get; set; } = -1; // Network peer ID
+        public bool IsLocal { get; set; } = true; // Whether this player is local
+        
+        public PlayerRegistration(int id, int device, Color color, int peerId = -1, bool isLocal = true)
         {
             Color = color;
             Id = id;
             Device = device;
+            PeerId = peerId;
+            IsLocal = isLocal;
         }
     }
 }

@@ -16,12 +16,20 @@ public partial class PlayerController : CharacterBody2D
 
 	[Export]
 	public int PlayerId;
+	
+	public int PeerId = -1; // Network peer ID
+	public bool IsLocal = true; // Whether this player is controlled locally
 
 	private bool hasExploded = false;
 	private bool isBoosting = false;
 	private Vector2 boostDirection;
 	private float boostTimer = 0.0f;
 	private float boostCooldownTimer = 0.0f;
+	
+	// Network sync variables
+	private Vector2 networkPosition;
+	private Vector2 networkVelocity;
+	private bool useNetworkState = false;
 
 	public override void _PhysicsProcess(double delta)
 	{
@@ -33,6 +41,16 @@ public partial class PlayerController : CharacterBody2D
 
 		if (boostCooldownTimer > 0.0f)
 			boostCooldownTimer -= (float)delta;
+
+		// For network players, use interpolated network state
+		if (!IsLocal && useNetworkState)
+		{
+			// Interpolate to network position for smooth movement
+			GlobalPosition = GlobalPosition.Lerp(networkPosition, 0.25f);
+			Velocity = networkVelocity;
+			HandleMove(Velocity, delta);
+			return;
+		}
 
 		if (isBoosting)
 		{
@@ -59,6 +77,12 @@ public partial class PlayerController : CharacterBody2D
 		}
 
 		HandleMove(Velocity, delta);
+		
+		// Sync position and velocity over network if this is a local player
+		if (IsLocal && NetworkManager.Instance != null && NetworkManager.Instance.IsNetworkActive)
+		{
+			RpcId(0, nameof(SyncPlayerState), GlobalPosition, Velocity, isBoosting, boostCooldownTimer);
+		}
 	}
 
 	private void HandleMove(Vector2 velocity, double delta)
@@ -101,6 +125,9 @@ public partial class PlayerController : CharacterBody2D
 	{
 		PlayerId = playerState.Id;
 		PlayerMode = playerState.Mode;
+		PeerId = playerState.PeerId;
+		IsLocal = playerState.IsLocal;
+		
 		PlayerSprite = GetNode<Sprite2D>("PlayerSprite");
 		PlayerDieEffect = GetNode<CpuParticles2D>("PlayerDieEffect");
 		Color color = playerState.Color;
@@ -119,12 +146,24 @@ public partial class PlayerController : CharacterBody2D
 				GetParent<SpikeballManager>().GoalScored += Explode;
 				break;
 		}
+		
+		GD.Print($"Initialized player {PlayerId} (Peer: {PeerId}, Local: {IsLocal})");
 	}
 
 	public override void _ExitTree()
 	{
 		GetParent<SpikeballManager>().GoalScored -= Explode;
 		base._ExitTree();
+	}
+	
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Unreliable)]
+	public void SyncPlayerState(Vector2 position, Vector2 velocity, bool boosting, float boostCd)
+	{
+		networkPosition = position;
+		networkVelocity = velocity;
+		isBoosting = boosting;
+		boostCooldownTimer = boostCd;
+		useNetworkState = true;
 	}
 
 }

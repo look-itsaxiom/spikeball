@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 GameManager="*res://Scripts/GameManager.cs"
 PlayerRegistrar="*res://Scripts/PlayerRegistrar.cs"
+NetworkManager="*res://Scripts/NetworkManager.cs"
 
 [display]
 

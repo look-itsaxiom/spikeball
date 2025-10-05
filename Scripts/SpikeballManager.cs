@@ -84,11 +84,19 @@ public partial class SpikeballManager : Node2D
             {
                 Id = playerRegistration.Id,
                 Mode = PlayerMode.Setup,
-                Color = playerRegistration.Color
+                Color = playerRegistration.Color,
+                PeerId = playerRegistration.PeerId,
+                IsLocal = playerRegistration.IsLocal
             };
             Players.Add(playerRegistration.Id, player);
             PlayerScores.Add(playerRegistration.Id, 0);
             PlayerHasBeenBallRecently.Add(playerRegistration.Id, false);
+            
+            // Sync player registration over network if hosting
+            if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+            {
+                Rpc(nameof(SyncPlayerRegistration), playerRegistration.Id, playerRegistration.PeerId, playerRegistration.Color);
+            }
         }
 
         StartUI.CreatePlayerScoreUI(Players);
@@ -250,6 +258,26 @@ public partial class SpikeballManager : Node2D
         PlayerController ballPlayerController = PlayerControllers.Values.FirstOrDefault(pc => pc.PlayerMode == PlayerMode.Ball);
         ballPlayerController?.Explode();
         EmitSignal(SignalName.GoalStopped);
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncPlayerRegistration(int playerId, int peerId, Color color)
+    {
+        if (!Players.ContainsKey(playerId))
+        {
+            Player player = new Player
+            {
+                Id = playerId,
+                Mode = PlayerMode.Setup,
+                Color = color,
+                PeerId = peerId,
+                IsLocal = false // Remote players are not local
+            };
+            Players.Add(playerId, player);
+            PlayerScores.Add(playerId, 0);
+            PlayerHasBeenBallRecently.Add(playerId, false);
+            GD.Print($"Synced remote player {playerId} from peer {peerId}");
+        }
     }
 
 }
