@@ -25,6 +25,8 @@ public partial class PlayerSelect : Control
     public Control ColorOptionTemplate;
     public VBoxContainer PlayerLanesContainer;
     public Label JoinBanner;
+    public Button NetworkButton;
+    public Button StartGameButton;
     public Dictionary<int, Color> colorXPositionMap = new Dictionary<int, Color>();
     public Dictionary<int, Control> playerIdToLaneMap = new Dictionary<int, Control>();
     public Dictionary<int, Array<Vector2I>> playerLaneAnchorPoints = new Dictionary<int, Array<Vector2I>>();
@@ -38,6 +40,20 @@ public partial class PlayerSelect : Control
         ColorOptionTemplate = GetNode<Control>("PlayerColorSelect/ColorOptions/ColorOption");
         JoinBanner = GetNode<Label>("JoinBanner");
         PlayerLanesContainer = GetNode<VBoxContainer>("PlayerColorSelect/PlayerLanes");
+        
+        // Try to get network button if it exists
+        if (HasNode("NetworkButton"))
+        {
+            NetworkButton = GetNode<Button>("NetworkButton");
+            NetworkButton.Pressed += OnNetworkButtonPressed;
+        }
+        
+        // Try to get start game button if it exists
+        if (HasNode("StartGameButton"))
+        {
+            StartGameButton = GetNode<Button>("StartGameButton");
+            StartGameButton.Pressed += OnStartGameButtonPressed;
+        }
 
         InitializeColorOptions();
 
@@ -51,6 +67,24 @@ public partial class PlayerSelect : Control
             JoinBanner.Visible = !JoinBanner.Visible;
         };
         AddChild(joinBannerTimer);
+    }
+    
+    private void OnNetworkButtonPressed()
+    {
+        GetTree().ChangeSceneToFile("res://Scenes/NetworkLobby.tscn");
+    }
+    
+    private void OnStartGameButtonPressed()
+    {
+        // Check if at least one player is registered
+        if (PlayerRegistrar.Instance.GetRegisteredPlayers().Count == 0)
+        {
+            GD.Print("No players registered yet!");
+            return;
+        }
+        
+        // Transition to the game scene
+        GetTree().ChangeSceneToFile("res://Scenes/Core_Spikeball.tscn");
     }
 
     public override void _Input(InputEvent @event)

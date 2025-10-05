@@ -84,11 +84,19 @@ public partial class SpikeballManager : Node2D
             {
                 Id = playerRegistration.Id,
                 Mode = PlayerMode.Setup,
-                Color = playerRegistration.Color
+                Color = playerRegistration.Color,
+                PeerId = playerRegistration.PeerId,
+                IsLocal = playerRegistration.IsLocal
             };
             Players.Add(playerRegistration.Id, player);
             PlayerScores.Add(playerRegistration.Id, 0);
             PlayerHasBeenBallRecently.Add(playerRegistration.Id, false);
+            
+            // Sync player registration over network if hosting
+            if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+            {
+                Rpc(nameof(SyncPlayerRegistration), playerRegistration.Id, playerRegistration.PeerId, playerRegistration.Color);
+            }
         }
 
         StartUI.CreatePlayerScoreUI(Players);
@@ -113,7 +121,23 @@ public partial class SpikeballManager : Node2D
         // just in case
         PlayerControllers.Clear();
         ClearPlayerControllers();
-        var roundBallPlayer = PickBallPlayer();
+        
+        // Only host picks the ball player
+        Player roundBallPlayer;
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsNetworkActive || NetworkManager.Instance.IsHost)
+        {
+            roundBallPlayer = PickBallPlayer();
+        }
+        else
+        {
+            // Clients wait for sync
+            roundBallPlayer = GetBallPlayer();
+            if (roundBallPlayer == null)
+            {
+                GD.PrintErr("Client: Ball player not synced yet!");
+                return;
+            }
+        }
 
         GD.Print($"New ball player: {roundBallPlayer.Id} - {roundBallPlayer.Mode}");
         GD.Print("Setting up ball player controller...");
@@ -188,6 +212,16 @@ public partial class SpikeballManager : Node2D
             }
         }
         GD.Print("Scores calculated.");
+        
+        // Sync scores over network
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+        {
+            foreach (var score in PlayerScores)
+            {
+                Rpc(nameof(SyncScore), score.Key, score.Value);
+            }
+        }
+        
         GD.Print("Updating player scores in UI...");
         StartUI.UpdatePlayerScores(PlayerScores);
         GD.Print("Player scores updated in UI.");
@@ -241,6 +275,13 @@ public partial class SpikeballManager : Node2D
         newBallPlayer.Mode = PlayerMode.Ball;
         PlayerHasBeenBallRecently[newBallPlayerId] = true;
         Players.Values.Where(p => p.Id != newBallPlayer.Id).ToList().ForEach(p => p.Mode = PlayerMode.SpikeBall);
+        
+        // Sync ball player selection over network
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+        {
+            Rpc(nameof(SyncBallPlayer), newBallPlayerId);
+        }
+        
         EmitSignal(nameof(BallPlayerChanged));
         return newBallPlayer;
     }
@@ -250,6 +291,56 @@ public partial class SpikeballManager : Node2D
         PlayerController ballPlayerController = PlayerControllers.Values.FirstOrDefault(pc => pc.PlayerMode == PlayerMode.Ball);
         ballPlayerController?.Explode();
         EmitSignal(SignalName.GoalStopped);
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncPlayerRegistration(int playerId, int peerId, Color color)
+    {
+        if (!Players.ContainsKey(playerId))
+        {
+            Player player = new Player
+            {
+                Id = playerId,
+                Mode = PlayerMode.Setup,
+                Color = color,
+                PeerId = peerId,
+                IsLocal = false // Remote players are not local
+            };
+            Players.Add(playerId, player);
+            PlayerScores.Add(playerId, 0);
+            PlayerHasBeenBallRecently.Add(playerId, false);
+            GD.Print($"Synced remote player {playerId} from peer {peerId}");
+        }
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncBallPlayer(int ballPlayerId)
+    {
+        // Update player modes based on ball player ID
+        foreach (var player in Players.Values)
+        {
+            if (player.Id == ballPlayerId)
+            {
+                player.Mode = PlayerMode.Ball;
+                PlayerHasBeenBallRecently[ballPlayerId] = true;
+            }
+            else
+            {
+                player.Mode = PlayerMode.SpikeBall;
+            }
+        }
+        GD.Print($"Synced ball player selection: Player {ballPlayerId} is now the ball");
+    }
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SyncScore(int playerId, int score)
+    {
+        if (PlayerScores.ContainsKey(playerId))
+        {
+            PlayerScores[playerId] = score;
+            StartUI.UpdatePlayerScores(PlayerScores);
+            GD.Print($"Synced score for player {playerId}: {score}");
+        }
     }
 
 }
